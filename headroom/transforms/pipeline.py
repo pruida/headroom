@@ -477,6 +477,23 @@ class TransformPipeline:
                     waste_signals=waste_signals.to_dict() if waste_signals is not None else None,
                 )
 
+        if record_metrics:
+            try:
+                from ..dump import dump_request
+
+                dump_request(
+                    original_messages=messages,
+                    compressed_messages=current_messages,
+                    model=model,
+                    tokens_before=tokens_before,
+                    tokens_after=tokens_after,
+                    transforms_applied=all_transforms,
+                    request_id=kwargs.get("request_id", ""),
+                    provider=provider_name,
+                )
+            except Exception:
+                logger.debug("dump_request failed", exc_info=True)
+
         return TransformResult(
             messages=current_messages,
             tokens_before=tokens_before,
